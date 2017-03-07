@@ -393,6 +393,20 @@ describe("uiMask", function () {
       input.triggerHandler("change"); // Because IE8 and below are terrible
       expect(scope.x).toBeUndefined();
     });
+
+    it('should accept string patterns as well', function(){
+        scope.options = {
+            escChar: '!',
+            maskDefinitions: {
+                "a": '[a-z]'
+            }
+        };
+        var input  = compileElement(inputHtml);
+        scope.$apply("mask = 'a'");
+        input.val("cC").triggerHandler("input");
+        expect(input.val()).toBe("c");
+
+    })
   });
 
   describe("escChar", function () {

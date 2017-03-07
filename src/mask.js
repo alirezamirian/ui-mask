@@ -410,7 +410,12 @@ angular.module('ui.mask', [])
                                             maskCaretMap.push(characterCount);
 
                                             maskPlaceholder += getPlaceholderChar(i - numberOfOptionalCharacters);
-                                            maskPatterns.push(linkOptions.maskDefinitions[chr]);
+                                            if(angular.isString(linkOptions.maskDefinitions[chr])){
+                                                maskPatterns.push(new RegExp(linkOptions.maskDefinitions[chr]));
+                                            }
+                                            else{
+                                                maskPatterns.push(linkOptions.maskDefinitions[chr]);
+                                            }
 
                                             characterCount++;
                                             if (!isOptional) {
