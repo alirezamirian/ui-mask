@@ -1,7 +1,7 @@
 /*!
  * angular-ui-mask
  * https://github.com/angular-ui/ui-mask
- * Version: 1.8.7 - 2016-07-26T15:59:07.992Z
+ * Version: 1.8.7 - 2017-03-11T11:10:58.809Z
  * License: MIT
  */
 
@@ -205,6 +205,8 @@ angular.module('ui.mask', [])
                             }
 
                             iAttrs.$observe('uiMask', initialize);
+                            scope.$watch('uiOptions.maskDefinitions', initialize, true);
+
                             if (angular.isDefined(iAttrs.uiMaskPlaceholder)) {
                                 iAttrs.$observe('uiMaskPlaceholder', initPlaceholder);
                             }
@@ -420,7 +422,12 @@ angular.module('ui.mask', [])
                                             maskCaretMap.push(characterCount);
 
                                             maskPlaceholder += getPlaceholderChar(i - numberOfOptionalCharacters);
-                                            maskPatterns.push(linkOptions.maskDefinitions[chr]);
+                                            if(angular.isString(linkOptions.maskDefinitions[chr])){
+                                                maskPatterns.push(new RegExp(linkOptions.maskDefinitions[chr]));
+                                            }
+                                            else{
+                                                maskPatterns.push(linkOptions.maskDefinitions[chr]);
+                                            }
 
                                             characterCount++;
                                             if (!isOptional) {
