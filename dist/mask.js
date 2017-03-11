@@ -1,7 +1,7 @@
 /*!
  * angular-ui-mask
  * https://github.com/angular-ui/ui-mask
- * Version: 1.8.7 - 2016-07-26T15:59:07.992Z
+ * Version: 1.8.7 - 2017-03-11T11:41:17.812Z
  * License: MIT
  */
 
@@ -177,34 +177,35 @@ angular.module('ui.mask', [])
                                 }
                             }
 
-                            var linkOptions = {};
-
-                            if (iAttrs.uiOptions) {
-                                linkOptions = scope.$eval('[' + iAttrs.uiOptions + ']');
-                                if (angular.isObject(linkOptions[0])) {
-                                    // we can't use angular.copy nor angular.extend, they lack the power to do a deep merge
-                                    linkOptions = (function(original, current) {
-                                        for (var i in original) {
-                                            if (Object.prototype.hasOwnProperty.call(original, i)) {
-                                                if (current[i] === undefined) {
-                                                    current[i] = angular.copy(original[i]);
-                                                } else {
-                                                    if (angular.isObject(current[i]) && !angular.isArray(current[i])) {
-                                                        current[i] = angular.extend({}, original[i], current[i]);
+                            var linkOptions = options;
+                            scope.$watch(iAttrs.uiOptions, function(currentValue){
+                                if(currentValue){
+                                    linkOptions = scope.$eval('[' + iAttrs.uiOptions + ']');
+                                    if (angular.isObject(linkOptions[0])) {
+                                        // we can't use angular.copy nor angular.extend, they lack the power to do a deep merge
+                                        linkOptions = (function(original, current) {
+                                            for (var i in original) {
+                                                if (Object.prototype.hasOwnProperty.call(original, i)) {
+                                                    if (current[i] === undefined) {
+                                                        current[i] = angular.copy(original[i]);
+                                                    } else {
+                                                        if (angular.isObject(current[i]) && !angular.isArray(current[i])) {
+                                                            current[i] = angular.extend({}, original[i], current[i]);
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                        return current;
-                                    })(options, linkOptions[0]);
-                                } else {
-                                    linkOptions = options;  //gotta be a better way to do this..
+                                            return current;
+                                        })(options, linkOptions[0]);
+                                    } else {
+                                        linkOptions = options;  //gotta be a better way to do this..
+                                    }
+                                    initialize(iAttrs.uiMask);
                                 }
-                            } else {
-                                linkOptions = options;
-                            }
+                            }, true);
 
                             iAttrs.$observe('uiMask', initialize);
+
                             if (angular.isDefined(iAttrs.uiMaskPlaceholder)) {
                                 iAttrs.$observe('uiMaskPlaceholder', initPlaceholder);
                             }
@@ -420,7 +421,12 @@ angular.module('ui.mask', [])
                                             maskCaretMap.push(characterCount);
 
                                             maskPlaceholder += getPlaceholderChar(i - numberOfOptionalCharacters);
-                                            maskPatterns.push(linkOptions.maskDefinitions[chr]);
+                                            if(angular.isString(linkOptions.maskDefinitions[chr])){
+                                                maskPatterns.push(new RegExp(linkOptions.maskDefinitions[chr]));
+                                            }
+                                            else{
+                                                maskPatterns.push(linkOptions.maskDefinitions[chr]);
+                                            }
 
                                             characterCount++;
                                             if (!isOptional) {
